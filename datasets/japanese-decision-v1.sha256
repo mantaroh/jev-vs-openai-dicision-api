@@ -1,1 +1,11 @@
-2c083571017468960a2807291be4b71989801f2f1bc5708f6a6e1e79aa3a5271  japanese-decision-v1.jsonl
+# Canonical pre-shard v1 SHA-256:
+# 2c083571017468960a2807291be4b71989801f2f1bc5708f6a6e1e79aa3a5271  japanese-decision-v1.jsonl
+e9f26d0da21b2659c321f78f821dbc238174c3d160342c375eb916c3087f3098  japanese-decision-v1/agent-action-1.jsonl
+539f8d5a3bcddc0dedf962be5f515fe844d8e53eb89074bd7ce0fb781eac19b5  japanese-decision-v1/agent-action-2.jsonl
+ccd71cf12bb569a246110a9a133ca9074f39ef838e6fe517a1b7bb4cd04a97ef  japanese-decision-v1/agent-action-3.jsonl
+155b79a32e9740b61936709a91f39a43415d0ec4d761c58873bfb624ff71a585  japanese-decision-v1/agent-action-4.jsonl
+8df052e319b4ed83c576f41a618f80d38d75bce4956c91f71d0009dcdad373b7  japanese-decision-v1/model-routing.jsonl
+41f047b8f54904c1d0324301378002a174009f24865e6dd6c67a625bb7fdb8ff  japanese-decision-v1/risk-review-1.jsonl
+65e055be81a2a8b6572ad26154cc0442231922497e40d2382f29d4bf123dab8e  japanese-decision-v1/risk-review-2.jsonl
+064f11fdba789f5a8ed5f5efe0b16dcfb6c07c4fcc809cab2f0dd9ba5f17d4d0  japanese-decision-v1/support-routing-1.jsonl
+11f5b6887ae4faea75d758d9d573a7f954f975ee4adce14dfddce47998a661af  japanese-decision-v1/support-routing-2.jsonl
