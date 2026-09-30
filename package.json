@@ -1,12 +1,12 @@
 {
-  "name": "decision-benchmark",
+  "name": "jev-vs-openai-dicision-api",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "bench:jev": "bun run src/runner.ts --adapter jev --dataset datasets/japanese-decision-v1.jsonl",
-    "bench:openai": "bun run src/runner.ts --adapter openai-decisions --dataset datasets/japanese-decision-v1.jsonl",
+    "bench:jev": "bun run src/runner.ts --adapter jev --dataset datasets/japanese-decision-v1",
+    "bench:openai": "bun run src/runner.ts --adapter openai-decisions --dataset datasets/japanese-decision-v1",
     "report": "bun run src/report.ts",
-    "check": "bun run src/check-dataset.ts"
+    "check": "bun run src/check-dataset.ts datasets/japanese-decision-v1"
   }
 }
