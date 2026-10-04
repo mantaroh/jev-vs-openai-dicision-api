@@ -28,6 +28,76 @@ probability / confidence を提供しない API の場合、その指標は `-` 
 
 `latencyMs` はリクエスト開始からレスポンスヘッダ受信まで（TTFB）です。以前の結果と比較できるよう、この定義は変えていません。body の受信時間は `bodyMs` に別で記録します。
 
+## 結果（2026-10-04 時点）
+
+dataset v1（260件）、concurrency 4 で実行した結果です。単価は `pricing.json` の 2026-10-04 時点の値を使っています。
+
+### Quality
+
+| Adapter | Completed | Accuracy | Macro F1 | Brier ↓ | ECE ↓ | p50 ms | p95 ms | p99 ms | Input tokens | Output tokens |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| jev | 260/260 | 92.69% | 92.30% | 0.1207 | 0.0744 | 203.4 | 284.9 | 340.5 | 120066 | 11823 |
+| clef | 260/260 | 91.15% | 90.33% | 0.1410 | 0.2022 | 451.5 | 996.9 | 1481.6 | 56934 | 0 |
+| clef-flash | 260/260 | 92.31% | 92.24% | 0.1444 | 0.2926 | 248.7 | 541.3 | 732.7 | 56934 | 0 |
+
+### Latency breakdown
+
+TTFB はリクエスト開始からレスポンスヘッダ受信まで、Body はヘッダ受信から body の読み込み完了までです（単位 ms）。
+
+| Adapter | TTFB p50 | TTFB p95 | Body p50 | Body p95 | Total p50 | Total p95 | Total p99 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| jev | 203.4 | 284.9 | 0.0 | 0.0 | 203.4 | 284.9 | 340.5 |
+| clef | 451.5 | 996.9 | 0.0 | 1.7 | 451.5 | 996.9 | 1483.3 |
+| clef-flash | 248.7 | 541.3 | 0.0 | 1.5 | 248.8 | 541.3 | 732.7 |
+
+### Cost
+
+| Adapter | Input $/1M tok | Output $/1M tok | Total USD | USD per 1k requests | Price checked |
+|---|---:|---:|---:|---:|---|
+| jev | $0.0420 | $0.0000 | $0.0050 | $0.0194 | 2026-10-04 |
+| clef | $0.2400 | $0.0000 | $0.0137 | $0.0526 | 2026-10-04 |
+| clef-flash | $0.0900 | $0.0000 | $0.0051 | $0.0197 | 2026-10-04 |
+
+### グラフ
+
+```mermaid
+xychart-beta
+    title "Accuracy (%)"
+    x-axis ["jev", "clef", "clef-flash"]
+    y-axis "Accuracy (%)" 0 --> 100
+    bar [92.69, 91.15, 92.31]
+```
+
+```mermaid
+xychart-beta
+    title "ECE (lower is better)"
+    x-axis ["jev", "clef", "clef-flash"]
+    y-axis "ECE" 0 --> 0.3
+    bar [0.0744, 0.2022, 0.2926]
+```
+
+```mermaid
+xychart-beta
+    title "Latency p50 (ms)"
+    x-axis ["jev", "clef", "clef-flash"]
+    y-axis "ms" 0 --> 500
+    bar [203.4, 451.5, 248.7]
+```
+
+```mermaid
+xychart-beta
+    title "USD per 1k requests"
+    x-axis ["jev", "clef", "clef-flash"]
+    y-axis "USD" 0 --> 0.06
+    bar [0.0194, 0.0526, 0.0197]
+```
+
+### 読み方
+
+- Accuracy はどれも 91〜93% でほぼ同じですが、ECE は jev が 0.074、clef 系は 0.20〜0.29 で、確率の校正には差があります。
+- body の受信時間はどれもほぼ 0ms で、レイテンシのほとんどは TTFB（サーバー処理と往復）です。
+- input tokens は tokenizer の違いで jev が clef 系の約2倍あるため、費用は token 単価ではなく 1000リクエストあたりで比べています。jev と clef-flash がほぼ同じで、clef は約2.7倍です。
+
 ## 費用の単価
 
 費用は `pricing.json` の単価と token usage から `bun run report` の時点で計算します。単価を直したときは、ベンチを再実行せず `bun run report` だけで計算し直せます。
