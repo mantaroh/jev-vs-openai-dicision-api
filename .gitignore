@@ -1,0 +1,5 @@
+.env
+node_modules/
+results/*.jsonl
+results/*.summary.json
+results/report.md

@@ -1,6 +1,8 @@
 import { loadDataset } from "./load-dataset";
 import type { DecisionAdapter, DecisionResult } from "./types";
 import { JevAdapter } from "./adapters/jev";
+import { CloudflareClefAdapter } from "./adapters/cloudflare-clef";
+import { CloudflareClefFlashAdapter } from "./adapters/cloudflare-clef-flash";
 import { OpenAIDecisionsAdapter } from "./adapters/openai-decisions";
 import { summarize } from "./metrics";
 
@@ -16,6 +18,8 @@ const concurrency = Math.max(1, Number(arg("--concurrency", "4")));
 
 const adapters: Record<string, () => DecisionAdapter> = {
   jev: () => new JevAdapter(),
+  clef: () => new CloudflareClefAdapter(),
+  "clef-flash": () => new CloudflareClefFlashAdapter(),
   "openai-decisions": () => new OpenAIDecisionsAdapter()
 };
 
@@ -60,6 +64,7 @@ async function worker() {
 
 await Promise.all(Array.from({ length: concurrency }, worker));
 
+await Bun.write("results/.gitkeep", "");
 await Bun.write(
   `results/${adapterName}.jsonl`,
   results.map(r => JSON.stringify(r)).join("\n") + "\n"
