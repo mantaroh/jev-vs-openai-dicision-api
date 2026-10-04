@@ -20,9 +20,33 @@ OpenAI Decisions API の一般公開前にデータセットを固定し、公�
 - Multiclass Brier score
 - ECE (Expected Calibration Error)
 - latency p50 / p95 / p99
+- latency の内訳（TTFB / body 受信 / 合計）
 - input / output token usage
+- 費用（合計 USD / 1000リクエストあたり USD）
 
 probability / confidence を提供しない API の場合、その指標は `-` として扱います。
+
+`latencyMs` はリクエスト開始からレスポンスヘッダ受信まで（TTFB）です。以前の結果と比較できるよう、この定義は変えていません。body の受信時間は `bodyMs` に別で記録します。
+
+## 費用の単価
+
+費用は `pricing.json` の単価と token usage から `bun run report` の時点で計算します。単価を直したときは、ベンチを再実行せず `bun run report` だけで計算し直せます。
+
+```json
+{
+  "jev": {
+    "inputUsdPerMTok": 0.5,
+    "outputUsdPerMTok": 2,
+    "source": "https://...",
+    "checkedAt": "2026-10-04"
+  }
+}
+```
+
+- 単価は USD / 1M tokens で、各社の公式料金ページから転記します（上の値は例です）
+- `source` に根拠の URL、`checkedAt` に確認日、必要なら `note` に補足を書きます
+- 単価が `null` の adapter は、費用を `-` と表示します
+- エラーになったリクエストは token usage が取れないため、費用には含めません
 
 ## Dataset
 

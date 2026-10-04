@@ -16,7 +16,12 @@ export type DecisionResult = {
   choice: string;
   confidence?: number;
   probabilities?: Record<string, number>;
+  /** Request start to response headers (TTFB). Kept for comparability with earlier runs. */
   latencyMs: number;
+  /** Same as latencyMs; recorded explicitly alongside bodyMs. */
+  ttfbMs?: number;
+  /** Response headers to body fully read. */
+  bodyMs?: number;
   inputTokens?: number;
   outputTokens?: number;
   error?: string;

@@ -44,6 +44,12 @@ export function summarize(results: DecisionResult[]) {
   }
 
   const latencies = valid.map(r => r.latencyMs);
+  const timed = valid.filter(r => typeof r.bodyMs === "number");
+  const dist = (xs: number[]) => ({
+    p50: percentile(xs, 50),
+    p95: percentile(xs, 95),
+    p99: percentile(xs, 99)
+  });
   return {
     total: results.length,
     completed: valid.length,
@@ -57,6 +63,11 @@ export function summarize(results: DecisionResult[]) {
       p95: percentile(latencies, 95),
       p99: percentile(latencies, 99),
       mean: latencies.length ? latencies.reduce((a,b)=>a+b,0)/latencies.length : null
+    },
+    timingMs: {
+      ttfb: dist(timed.map(r => r.latencyMs)),
+      body: dist(timed.map(r => r.bodyMs!)),
+      total: dist(timed.map(r => r.latencyMs + r.bodyMs!))
     },
     usage: {
       inputTokens: valid.reduce((s,r)=>s+(r.inputTokens ?? 0),0),

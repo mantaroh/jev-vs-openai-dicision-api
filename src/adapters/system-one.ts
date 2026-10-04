@@ -23,6 +23,7 @@ type SystemOneResponse = {
 type SystemOneTransportResult = {
   body: unknown;
   latencyMs: number;
+  bodyMs?: number;
 };
 
 const isRecord = (value: unknown): value is JsonObject =>
@@ -60,7 +61,7 @@ export abstract class SystemOneAdapter implements DecisionAdapter {
 
   async decide(testCase: DatasetCase): Promise<Omit<DecisionResult, "id" | "expected">> {
     const model = this.modelName();
-    const { body, latencyMs } = await this.invokeSystemOne({
+    const { body, latencyMs, bodyMs } = await this.invokeSystemOne({
       model,
       state: testCase.input,
       questions: {
@@ -93,6 +94,8 @@ export abstract class SystemOneAdapter implements DecisionAdapter {
       confidence: numberOrUndefined(answer.confidence),
       probabilities: probabilityMap(answer.probabilities),
       latencyMs,
+      ttfbMs: latencyMs,
+      bodyMs,
       inputTokens: numberOrUndefined(usage?.input_tokens) ?? numberOrUndefined(usage?.prompt_tokens),
       outputTokens: numberOrUndefined(usage?.output_tokens) ?? numberOrUndefined(usage?.completion_tokens)
     };
@@ -129,6 +132,7 @@ export abstract class HttpSystemOneAdapter extends SystemOneAdapter {
     });
     const latencyMs = performance.now() - started;
     const text = await response.text();
+    const bodyMs = performance.now() - started - latencyMs;
     if (!response.ok) throw new Error(`${this.name} HTTP ${response.status}: ${text}`);
 
     let body: unknown;
@@ -138,7 +142,7 @@ export abstract class HttpSystemOneAdapter extends SystemOneAdapter {
       throw new Error(`${this.name} returned invalid JSON: ${String(error)}`);
     }
 
-    return { body: this.unwrapResponse(body), latencyMs };
+    return { body: this.unwrapResponse(body), latencyMs, bodyMs };
   }
 }
 

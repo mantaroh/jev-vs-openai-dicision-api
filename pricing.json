@@ -1,0 +1,24 @@
+{
+  "jev": {
+    "inputUsdPerMTok": 0.042,
+    "outputUsdPerMTok": 0,
+    "source": "https://docs.typesafe.ai/models#models",
+    "checkedAt": "2026-10-04",
+    "note": "Jev 1.13 (jev-1.13.0)。input token のみ課金、output token は無料。jev-ai.pro は独立運営の再販で別価格"
+  },
+  "clef": {
+    "inputUsdPerMTok": 0.24,
+    "outputUsdPerMTok": 0,
+    "source": "https://developers.cloudflare.com/workers-ai/models/clef/",
+    "checkedAt": "2026-10-04",
+    "note": "Unit Pricing は input の単価のみ記載"
+  },
+  "clef-flash": {
+    "inputUsdPerMTok": 0.09,
+    "outputUsdPerMTok": 0,
+    "source": "https://developers.cloudflare.com/workers-ai/models/clef-flash/",
+    "checkedAt": "2026-10-04",
+    "note": "Unit Pricing は input の単価のみ記載"
+  },
+  "openai-decisions": { "inputUsdPerMTok": null, "outputUsdPerMTok": null, "source": "", "checkedAt": "" }
+}
