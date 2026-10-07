@@ -2,16 +2,15 @@
 
 日本語の decision model を、固定された同一データセットで比較するベンチマークです。精度だけでなく、確率の校正、レイテンシ、トークン使用量、口語・typo・日本語と英語の混在などへの頑健性を測定します。
 
-OpenAI Decisions API の一般公開前にデータセットを固定し、公開後に評価条件を後付けで変更しないことを目的としています。
+OpenAI Decisions API の公開前にデータセットを固定し、公開後に評価条件を後付けで変更しないことを目的としています。OpenAI Decisions API は 2026-10-06 に public beta として公開されたため、同じ dataset v1 と同じ実行条件で計測しました。
 
 ## 現在の状態
 
 - TypeSafe Jev adapter: 実行可能 (`bun run bench:jev`)
 - Cloudflare Clef adapter: 実行可能 (`bun run bench:clef`)
 - Cloudflare Clef-flash adapter: 実行可能 (`bun run bench:clef-flash`)
-- OpenAI Decisions API adapter: 公開待ち stub (`bun run bench:openai`)
+- OpenAI Decisions API adapter: 実行可能 (`bun run bench:openai`、`gpt-6-luna`、public beta)
 - 日本語 dataset v1: **260件**
-- OpenAI Decisions API: 2026-09-30 時点では limited preview のため、未公開 schema は推測していません
 
 ## 評価項目
 
@@ -28,9 +27,9 @@ probability / confidence を提供しない API の場合、その指標は `-` 
 
 `latencyMs` はリクエスト開始からレスポンスヘッダ受信まで（TTFB）です。以前の結果と比較できるよう、この定義は変えていません。body の受信時間は `bodyMs` に別で記録します。
 
-## 結果（2026-10-04 時点）
+## 結果（2026-10-07 時点）
 
-dataset v1（260件）、concurrency 4 で実行した結果です。単価は `pricing.json` の 2026-10-04 時点の値を使っています。
+dataset v1（260件）、concurrency 4 で実行した結果です。jev / clef / clef-flash は 2026-10-04、openai-decisions は 2026-10-07（JST）に実行しました。単価は `pricing.json` の値（確認日は表に記載）を使っています。
 
 ### Quality
 
@@ -39,6 +38,7 @@ dataset v1（260件）、concurrency 4 で実行した結果です。単価は `
 | jev | 260/260 | 92.69% | 92.30% | 0.1207 | 0.0744 | 203.4 | 284.9 | 340.5 | 120066 | 11823 |
 | clef | 260/260 | 91.15% | 90.33% | 0.1410 | 0.2022 | 451.5 | 996.9 | 1481.6 | 56934 | 0 |
 | clef-flash | 260/260 | 92.31% | 92.24% | 0.1444 | 0.2926 | 248.7 | 541.3 | 732.7 | 56934 | 0 |
+| openai-decisions | 260/260 | 77.69% | 77.12% | 0.3052 | 0.0617 | 272.5 | 369.7 | 1130.5 | 56959 | 0 |
 
 ### Latency breakdown
 
@@ -49,6 +49,7 @@ TTFB はリクエスト開始からレスポンスヘッダ受信まで、Body �
 | jev | 203.4 | 284.9 | 0.0 | 0.0 | 203.4 | 284.9 | 340.5 |
 | clef | 451.5 | 996.9 | 0.0 | 1.7 | 451.5 | 996.9 | 1483.3 |
 | clef-flash | 248.7 | 541.3 | 0.0 | 1.5 | 248.8 | 541.3 | 732.7 |
+| openai-decisions | 272.5 | 369.7 | 0.0 | 0.0 | 272.5 | 369.7 | 1130.5 |
 
 ### Cost
 
@@ -57,44 +58,65 @@ TTFB はリクエスト開始からレスポンスヘッダ受信まで、Body �
 | jev | $0.0420 | $0.0000 | $0.0050 | $0.0194 | 2026-10-04 |
 | clef | $0.2400 | $0.0000 | $0.0137 | $0.0526 | 2026-10-04 |
 | clef-flash | $0.0900 | $0.0000 | $0.0051 | $0.0197 | 2026-10-04 |
+| openai-decisions | $0.1000 | $0.0000 | $0.0057 | $0.0219 | 2026-10-07 |
 
 ### グラフ
 
 ```mermaid
 xychart-beta
     title "Accuracy (%)"
-    x-axis ["jev", "clef", "clef-flash"]
+    x-axis ["jev", "clef", "clef-flash", "openai"]
     y-axis "Accuracy (%)" 0 --> 100
-    bar [92.69, 91.15, 92.31]
+    bar [92.69, 91.15, 92.31, 77.69]
 ```
 
 ```mermaid
 xychart-beta
     title "ECE (lower is better)"
-    x-axis ["jev", "clef", "clef-flash"]
+    x-axis ["jev", "clef", "clef-flash", "openai"]
     y-axis "ECE" 0 --> 0.3
-    bar [0.0744, 0.2022, 0.2926]
+    bar [0.0744, 0.2022, 0.2926, 0.0617]
 ```
 
 ```mermaid
 xychart-beta
     title "Latency p50 (ms)"
-    x-axis ["jev", "clef", "clef-flash"]
+    x-axis ["jev", "clef", "clef-flash", "openai"]
     y-axis "ms" 0 --> 500
-    bar [203.4, 451.5, 248.7]
+    bar [203.4, 451.5, 248.7, 272.5]
 ```
 
 ```mermaid
 xychart-beta
     title "USD per 1k requests"
-    x-axis ["jev", "clef", "clef-flash"]
+    x-axis ["jev", "clef", "clef-flash", "openai"]
     y-axis "USD" 0 --> 0.06
-    bar [0.0194, 0.0526, 0.0197]
+    bar [0.0194, 0.0526, 0.0197, 0.0219]
 ```
+
+### タスク別 Accuracy（openai-decisions）
+
+| Task | 正解 / 件数 | Accuracy |
+|---|---:|---:|
+| support-routing | 57 / 60 | 95.0% |
+| risk-review | 57 / 60 | 95.0% |
+| agent-action | 59 / 80 | 73.8% |
+| model-routing | 29 / 60 | 48.3% |
+
+多かった誤答は次のとおりです。
+
+| Task | 正解 → 回答 | 件数 |
+|---|---|---:|
+| model-routing | balanced → fast | 19 |
+| agent-action | execute_tool → human_review | 18 |
+| model-routing | reasoning → balanced | 11 |
 
 ### 読み方
 
-- Accuracy はどれも 91〜93% でほぼ同じですが、ECE は jev が 0.074、clef 系は 0.20〜0.29 で、確率の校正には差があります。
+- jev / clef 系の Accuracy は 91〜93% でほぼ同じですが、ECE は jev が 0.074、clef 系は 0.20〜0.29 で、確率の校正には差があります。
+- openai-decisions は Accuracy 77.69% で、他より 15 ポイント近く低いです。support-routing と risk-review は 95% で他と同程度なので、差は model-routing と agent-action に集中しています。model-routing では必要な reasoning 量を一段低く見積もり、agent-action ではツール実行で済むケースを human_review に回す傾向がありました。
+- 一方で ECE は 0.062 と4つの中で一番低く、確信度は外れたときにはちゃんと低く出ています。Brier が悪いのは Accuracy の低さによるものです。
+- openai-decisions の p99 は 1130ms ですが、p95 は 370ms です。1秒を超えたのは 260件中 7件だけでした。
 - body の受信時間はどれもほぼ 0ms で、レイテンシのほとんどは TTFB（サーバー処理と往復）です。
 - input tokens は tokenizer の違いで jev が clef 系の約2倍あるため、費用は token 単価ではなく 1000リクエストあたりで比べています。jev と clef-flash がほぼ同じで、clef は約2.7倍です。
 
@@ -203,20 +225,21 @@ POST https://api.cloudflare.com/client/v4/accounts/{account_id}/ai/run/@cf/cloud
 
 Cloudflare API が返す `result` envelope は共通の System One 互換層で展開するため、Jev と同じ結果形式で Accuracy、校正、レイテンシ、token usage を比較できます。
 
-## OpenAI Decisions API 公開後
+### OpenAI Decisions API
 
-`src/adapters/openai-decisions.ts` のみ、OpenAI の公式 request / response schema に合わせて実装します。
-
-公開後は公式 schema に実装を置き換えたうえで、次を実行します。
+公式ガイドの schema どおり、`POST https://api.openai.com/v1/decisions` に `model`、`input`、`questions`（`type: "choice"` の質問1つ）を渡します。dataset の `choices` は `[{ value, description }]` に変換し、response の `probabilities` 配列は他の adapter と同じ `{ value: probability }` の形に変換して集計します。
 
 ```bash
 export OPENAI_API_KEY=...
-export OPENAI_DECISIONS_ENDPOINT=...
-export OPENAI_DECISIONS_MODEL=...
+# 省略時は gpt-6-luna / https://api.openai.com/v1/decisions
+# export OPENAI_DECISIONS_MODEL=gpt-6-luna
+# export OPENAI_DECISIONS_ENDPOINT=https://api.openai.com/v1/decisions
 
 bun run bench:openai
 bun run report
 ```
+
+public beta のため、GA 時に schema やモデルが変わったら再計測します。
 
 ## レポート
 
@@ -279,6 +302,7 @@ bun run report
 
 - [Cloudflare Clef model documentation](https://developers.cloudflare.com/workers-ai/models/clef/)
 - [Cloudflare Workers AI REST API](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)
+- [OpenAI Decisions API guide](https://developers.openai.com/api/docs/guides/decisions)
 - TypeSafe Jev OpenAPI — `POST /v1/systemone`, choice, confidence, probabilities, token usage
 
 ## License

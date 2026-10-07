@@ -20,5 +20,11 @@
     "checkedAt": "2026-10-04",
     "note": "Unit Pricing は input の単価のみ記載"
   },
-  "openai-decisions": { "inputUsdPerMTok": null, "outputUsdPerMTok": null, "source": "", "checkedAt": "" }
+  "openai-decisions": {
+    "inputUsdPerMTok": 0.1,
+    "outputUsdPerMTok": 0,
+    "source": "https://developers.openai.com/api/docs/guides/decisions",
+    "checkedAt": "2026-10-07",
+    "note": "gpt-6-luna (public beta)。input token のみ課金、output・cache は課金なし。regional processing の割増は含めない"
+  }
 }
